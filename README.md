@@ -30,9 +30,10 @@ String credentials[][2] = {
 - ~~abfahrt in minuten~~
 - ~~mehrere monitore (wechsel über touchscreen)~~
 - ~~bunte überschriften~~
-- loading animation
+- loading animation between pages (not possible without async)
 - ~~RGB LED OFF (cant turn off)~~
-- sleep
-- wake up über touchscreen
+- ~~sleep~~
+- wake up über touchscreen (nicht möglich?)
+- wake up über button
 - 3d print case
 - umlaute

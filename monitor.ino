@@ -26,7 +26,8 @@ String url[4] = {"https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liv
                  "https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&tickerID=dep&start=yes&eqstops=false&evaId=1392169&dirInput=&showJourneys=11&maxJourneys=11&additionalTime=0&productsFilter=1111111111111&boardType=dep&outputMode=tickerDataOnly"};
 
 u_int16_t title_colors[4] = {TFT_RED, TFT_GREEN, TFT_SKYBLUE, TFT_YELLOW};
-unsigned long timer_delay = 30000; // 30 Seconds
+unsigned long timer_delay = 30000;       // 30 Seconds
+unsigned long time_to_sleep = 1000 * 60 * 10; // 60 Seconds
 
 /*-------- NTP ----------*/
 const char *ntpServer1 = "pool.ntp.org";
@@ -263,7 +264,7 @@ void request_data()
         String track = journey["tr"];
         String line = journey["pr"];
 
-        // TODO: abfahrt in min, Current "rt": { "status": null, "dlm": "2", "dlt": "17:44", "dld": "09.03.2025" }
+        // // TODO: abfahrt in min, Current "rt": { "status": null, "dlm": "2", "dlt": "17:44", "dld": "09.03.2025" }
         Serial.println(time + " " + train + " " + destination + " " + track);
         // tft.drawString(time + " " + train + " " + destination + " " + track, 0, 20 + row * 20);
         int y = 20 + row * 20;
@@ -320,6 +321,7 @@ void setup()
 }
 
 unsigned int last_time = 0;
+#define LCD_BACK_LIGHT_PIN 21
 
 void loop()
 {
@@ -356,5 +358,22 @@ void loop()
     }
 
     delay(500);
+  }
+
+  if (millis() > time_to_sleep)
+  {
+    Serial.println("Going to sleep");
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextSize(2);
+    tft.setTextDatum(MC_DATUM);
+    tft.drawString("Going to sleep", 320 / 2, 240 / 2);
+    delay(5000);
+    // turn screen off
+    tft.fillScreen(TFT_BLACK);
+    pinMode(LCD_BACK_LIGHT_PIN, OUTPUT);
+    digitalWrite(LCD_BACK_LIGHT_PIN, LOW);
+    delay(1000);
+
+    esp_deep_sleep_start();
   }
 }
