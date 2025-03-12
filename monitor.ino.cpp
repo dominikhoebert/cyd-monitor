@@ -1,3 +1,6 @@
+# 1 "C:\\Users\\Dominik\\AppData\\Local\\Temp\\tmp3ejxecyk"
+#include <Arduino.h>
+# 1 "C:/Users/Dominik/projects/cyd-monitor/monitor.ino"
 #include <Arduino.h>
 #include <WiFi.h>
 #include <string.h>
@@ -7,11 +10,20 @@
 #include "esp_sntp.h"
 #include <XPT2046_Touchscreen.h>
 #include "credentials.h"
-#include <TFT_eSPI.h> // Hardware-specific library
+#include <TFT_eSPI.h>
 
 #define TOUCH_CS
-
-/*-------- DEBUGGING ----------*/
+void Debug(String label, int val);
+void printLocalTime();
+String timeString();
+void timeavailable(struct timeval *t);
+void SetupCYD();
+void SetupWiFi();
+String decodeHtmlEntities(const String &str);
+void request_data();
+void setup();
+void loop();
+#line 15 "C:/Users/Dominik/projects/cyd-monitor/monitor.ino"
 void Debug(String label, int val)
 {
   Serial.print(label);
@@ -19,26 +31,26 @@ void Debug(String label, int val)
   Serial.println(val);
 }
 
-/*-------- PREFERENCES ----------*/
+
 String url[4] = {"https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&tickerID=dep&start=yes&eqstops=false&evaId=1292101&dirInput=1292001&showJourneys=11&maxJourneys=11&additionalTime=0&productsFilter=1011110000001&boardType=dep&outputMode=tickerDataOnly",
                  "https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&tickerID=dep&start=yes&eqstops=false&evaId=1292101&dirInput=&showJourneys=11&maxJourneys=11&additionalTime=0&productsFilter=0000000010000&boardType=dep&outputMode=tickerDataOnly",
                  "https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&tickerID=dep&start=yes&eqstops=false&evaId=1292101&dirInput=1292105&showJourneys=11&maxJourneys=11&additionalTime=0&productsFilter=1011110000001&boardType=dep&outputMode=tickerDataOnly",
                  "https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&tickerID=dep&start=yes&eqstops=false&evaId=1392169&dirInput=&showJourneys=11&maxJourneys=11&additionalTime=0&productsFilter=1111111111111&boardType=dep&outputMode=tickerDataOnly"};
 
 u_int16_t title_colors[4] = {TFT_RED, TFT_GREEN, TFT_SKYBLUE, TFT_YELLOW};
-unsigned long timer_delay = 30000; // 30 Seconds
+unsigned long timer_delay = 30000;
 
 
 
-/*-------- NTP ----------*/
+
 const char *ntpServer1 = "pool.ntp.org";
 const char *ntpServer2 = "time.nist.gov";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 0;
 
-const char *time_zone = "CET-1CEST,M3.5.0,M10.5.0/3"; // TimeZone rule for Europe/Rome including daylight adjustment rules (optional)
+const char *time_zone = "CET-1CEST,M3.5.0,M10.5.0/3";
 
-/*-------- CERTIFICATES ----------*/
+
 const char *test_root_ca =
     "-----BEGIN CERTIFICATE-----\n"
     "MIIDjjCCAnagAwIBAgIQAzrx5qcRqaC7KGSxHQn65TANBgkqhkiG9w0BAQsFADBh\n"
@@ -63,17 +75,10 @@ const char *test_root_ca =
     "MrY=\n"
     "-----END CERTIFICATE-----\n";
 
-/*-------- CYD (Cheap Yellow Display) ----------*/
+
 #include <SPI.h>
-TFT_eSPI tft = TFT_eSPI(); // Invoke custom library
-
-// ----------------------------
-// Touch Screen pins
-// ----------------------------
-
-// The CYD touch uses some non default
-// SPI pins
-
+TFT_eSPI tft = TFT_eSPI();
+# 77 "C:/Users/Dominik/projects/cyd-monitor/monitor.ino"
 #define XPT2046_IRQ 36
 #define XPT2046_MOSI 32
 #define XPT2046_MISO 39
@@ -106,7 +111,7 @@ String timeString()
   return String(timestamp);
 }
 
-// Callback function (gets called when time adjusts via NTP)
+
 void timeavailable(struct timeval *t)
 {
   Serial.println("Got time adjustment from NTP!");
@@ -144,7 +149,7 @@ void SetupWiFi()
 
       tft.fillScreen(TFT_BLACK);
       tft.setTextFont(2);
-      // tft.setFreeFont(&c__windows_fonts_calibrib14pt8b);
+
       tft.setTextSize(2);
       tft.setTextDatum(MC_DATUM);
       tft.drawString("ÄConnecting to", 320 / 2, 240 / 2 - 40);
@@ -152,16 +157,8 @@ void SetupWiFi()
       tft.drawString(ssid, 320 / 2, 240 / 2);
 
       WiFi.begin(ssid.c_str(), pass.c_str());
-
-      /**
-       * NTP server address could be acquired via DHCP,
-       *
-       * NOTE: This call should be made BEFORE esp32 acquires IP address via DHCP,
-       * otherwise SNTP option 42 would be rejected by default.
-       * NOTE: configTime() function call if made AFTER DHCP-client run
-       * will OVERRIDE acquired NTP server address
-       */
-      esp_sntp_servermode_dhcp(1); // (optional)
+# 164 "C:/Users/Dominik/projects/cyd-monitor/monitor.ino"
+      esp_sntp_servermode_dhcp(1);
 
       int tries = 5 * 2;
       String dots = "";
@@ -175,22 +172,22 @@ void SetupWiFi()
 
       if (WiFi.status() == WL_CONNECTED)
       {
-        // set notification call-back function
+
         sntp_set_time_sync_notification_cb(timeavailable);
 
-        /**
-         * This will set configured ntp servers and constant TimeZone/daylightOffset
-         * should be OK if your time zone does not need to adjust daylightOffset twice a year,
-         * in such a case time adjustment won't be handled automagically.
-         */
+
+
+
+
+
         configTime(gmtOffset_sec, daylightOffset_sec, ntpServer1, ntpServer2);
 
-        /**
-         * A more convenient approach to handle TimeZones with daylightOffset
-         * would be to specify a environment variable with TimeZone definition including daylight adjustmnet rules.
-         * A list of rules for your zone could be obtained from https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h
-         */
-        // configTzTime(time_zone, ntpServer1, ntpServer2);
+
+
+
+
+
+
         break;
       }
     }
@@ -218,7 +215,7 @@ void request_data()
   Serial.println("Requesting data");
   if (WiFi.status() == WL_CONNECTED)
   {
-    // Serial.println("WiFi connected");
+
     WiFiClientSecure client;
     client.setCACert(test_root_ca);
     HTTPClient http;
@@ -226,13 +223,13 @@ void request_data()
     http.begin(client, serverPath.c_str());
     http.addHeader("Content-Type", "application/json; charset=utf-8");
     int httpResponseCode = http.GET();
-    // Serial.println("HTTP Response code: " + String(httpResponseCode));
+
     if (httpResponseCode > 0)
     {
       String payload = http.getString();
       payload = String(payload.c_str());
       payload = decodeHtmlEntities(payload);
-      // Serial.println(payload);
+
       StaticJsonDocument<0> filter;
       filter.set(true);
       DynamicJsonDocument doc(4096 * 3);
@@ -243,13 +240,13 @@ void request_data()
         Serial.println(error.f_str());
         return;
       }
-      // Serial.println("Parsed JSON");
+
       String station_name = doc["stationName"];
       Serial.println(station_name);
       tft.fillScreen(TFT_BLACK);
       tft.setTextColor(title_colors[selection], TFT_BLACK);
       tft.setTextSize(1);
-      // tft.setTextFont(2);
+
       tft.setTextDatum(TL_DATUM);
       tft.drawString(station_name, 0, 0);
       tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -258,17 +255,17 @@ void request_data()
       int row = 0;
       for (JsonObject journey : doc["journey"].as<JsonArray>())
       {
-        // {"id":"92280811","ti":"13:11","da":"09.03.2025","pr":"REX 3","st":"Znojmo","lastStop":"Znojmo","ati":"14:36","tr":"3","trChg":false,"rt":false,"rta":false}
-        // {"ti":"13:11","pr":"REX 3","st":"Znojmo","tr":"3"}
+
+
         String time = journey["ti"];
         String train = journey["pr"];
         String destination = journey["st"];
         String track = journey["tr"];
         String line = journey["pr"];
 
-        // TODO: abfahrt in min, Current "rt": { "status": null, "dlm": "2", "dlt": "17:44", "dld": "09.03.2025" }
+
         Serial.println(time + " " + train + " " + destination + " " + track);
-        // tft.drawString(time + " " + train + " " + destination + " " + track, 0, 20 + row * 20);
+
         int y = 20 + row * 20;
         bool isCanceled = false;
         if (journey["rt"])
@@ -304,7 +301,7 @@ void request_data()
   }
 }
 
-/*-------- SETUP & LOOP ----------*/
+
 void setup()
 {
   Serial.begin(115200);
@@ -319,7 +316,7 @@ void loop()
 {
   if (millis() - last_time > timer_delay)
   {
-    // printLocalTime();
+
     request_data();
     last_time = millis();
   }

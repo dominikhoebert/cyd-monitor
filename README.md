@@ -4,6 +4,17 @@
 
 Use [ÖBB Link Creator](https://github.com/Dave2ooo/oebb-link-creator) then find the `fahrplan.oebb.at` url (using Developertools).
 
+### Credentials
+
+Needs a `credentials.h`
+
+```c
+String credentials[][2] = {
+    {"WifiSSID", "WifiPassword"},
+    {"OptionalOtherSSID", "OptionalOtherSSDPassword"},
+};
+```
+
 ## TODO
 
 - ~~Format als tabelle~~
@@ -13,7 +24,8 @@ Use [ÖBB Link Creator](https://github.com/Dave2ooo/oebb-link-creator) then find
 - ~~Aktuelle Zeit~~
 - ~~abfahrt in minuten~~
 - ~~mehrere monitore (wechsel über touchscreen)~~
-- bunte überschriften
+- ~~bunte überschriften~~
+- loading animation
 - RGB LED OFF
 - sleep
 - wake up über touchscreen
