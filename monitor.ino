@@ -28,8 +28,6 @@ String url[4] = {"https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liv
 u_int16_t title_colors[4] = {TFT_RED, TFT_GREEN, TFT_SKYBLUE, TFT_YELLOW};
 unsigned long timer_delay = 30000; // 30 Seconds
 
-
-
 /*-------- NTP ----------*/
 const char *ntpServer1 = "pool.ntp.org";
 const char *ntpServer2 = "time.nist.gov";
@@ -148,9 +146,8 @@ void SetupWiFi()
       tft.setTextSize(2);
       tft.setTextDatum(MC_DATUM);
       tft.drawString("ÄConnecting to", 320 / 2, 240 / 2 - 40);
-      tft.setTextSize(1);
       tft.drawString(ssid, 320 / 2, 240 / 2);
-
+      tft.setTextSize(1);
       WiFi.begin(ssid.c_str(), pass.c_str());
 
       /**
@@ -310,6 +307,15 @@ void setup()
   Serial.begin(115200);
   SetupCYD();
   SetupWiFi();
+
+  pinMode(4, OUTPUT);
+  pinMode(16, OUTPUT);
+  pinMode(17, OUTPUT);
+
+  digitalWrite(4, HIGH);
+  digitalWrite(16, HIGH);
+  digitalWrite(17, HIGH);
+
   request_data();
 }
 

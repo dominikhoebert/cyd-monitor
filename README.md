@@ -31,7 +31,7 @@ String credentials[][2] = {
 - ~~mehrere monitore (wechsel über touchscreen)~~
 - ~~bunte überschriften~~
 - loading animation
-- RGB LED OFF (cant turn off)
+- ~~RGB LED OFF (cant turn off)~~
 - sleep
 - wake up über touchscreen
 - 3d print case
