@@ -26,8 +26,8 @@ String url[4] = {"https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liv
                  "https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&tickerID=dep&start=yes&eqstops=false&evaId=1392169&dirInput=&showJourneys=11&maxJourneys=11&additionalTime=0&productsFilter=1111111111111&boardType=dep&outputMode=tickerDataOnly"};
 
 u_int16_t title_colors[4] = {TFT_RED, TFT_GREEN, TFT_SKYBLUE, TFT_YELLOW};
-unsigned long timer_delay = 30000;       // 30 Seconds
-unsigned long time_to_sleep = 1000 * 60 * 10; // 60 Seconds
+unsigned long timer_delay = 30000;            // 30 Seconds
+unsigned long time_to_sleep = 1000 * 60 * 10; // 10 minutes
 
 /*-------- NTP ----------*/
 const char *ntpServer1 = "pool.ntp.org";
@@ -80,6 +80,11 @@ TFT_eSPI tft = TFT_eSPI(); // Invoke custom library
 #define XPT2046_CS 33
 SPIClass mySpi = SPIClass(VSPI);
 XPT2046_Touchscreen ts(XPT2046_CS, XPT2046_IRQ);
+
+// ----------------------------
+// Sleep/Wake up pins
+// ----------------------------
+#define WAKEUP_GPIO GPIO_NUM_36
 
 void printLocalTime()
 {
@@ -306,6 +311,7 @@ void request_data()
 void setup()
 {
   Serial.begin(115200);
+  esp_sleep_enable_ext0_wakeup(WAKEUP_GPIO, 0); // 1 = High, 0 = Low
   SetupCYD();
   SetupWiFi();
 

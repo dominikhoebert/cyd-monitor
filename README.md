@@ -33,7 +33,6 @@ String credentials[][2] = {
 - loading animation between pages (not possible without async)
 - ~~RGB LED OFF (cant turn off)~~
 - ~~sleep~~
-- wake up über touchscreen (nicht möglich?)
-- wake up über button
-- 3d print case
+- ~~wake up über touchscreen (nicht möglich?)~~
+- ~~[3d print case](https://www.printables.com/model/685845-enclosure-for-sunton-esp32-2432s028r-cheap-yellow-)~~
 - umlaute
